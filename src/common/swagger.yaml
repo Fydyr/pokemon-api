@@ -1,0 +1,368 @@
+openapi: 3.0.0
+info:
+    title: Prisma Pokemon Cards API
+    version: 1.0.0
+    description: API pour gérer les cartes Pokémon, les utilisateurs et les attaques
+servers:
+    - url: http://localhost:3000
+      description: Serveur local
+tags:
+    - name: pokemon-cards
+      description: Opérations sur les cartes Pokémon
+    - name: user
+      description: Opérations sur les utilisateurs
+    - name: pokemon-attacks
+      description: Opérations sur les attaques Pokémon
+paths:
+    /pokemon-cards:
+        get:
+            tags:
+                - pokemon-cards
+            summary: Récupère toutes les cartes Pokémon
+            responses:
+                '200':
+                    description: Liste des cartes Pokémon
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/PokemonCard'
+                '204':
+                    description: Aucun Pokémon trouvé
+        post:
+            tags:
+                - pokemon-cards
+            summary: Crée une nouvelle carte Pokémon
+            security:
+                - bearerAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/PokemonCard'
+            responses:
+                '201':
+                    description: Carte Pokémon créée
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/PokemonCard'
+                '400':
+                    description: Données invalides
+                '401':
+                    description: Non autorisé
+                '409':
+                    description: Carte Pokémon déjà existante
+    /pokemon-cards/{pokemonCardId}:
+        get:
+            tags:
+                - pokemon-cards
+            summary: Récupère une carte Pokémon par son ID
+            parameters:
+                - name: pokemonCardId
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+                  description: ID de la carte Pokémon
+            responses:
+                '200':
+                    description: Carte Pokémon trouvée
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/PokemonCard'
+                '404':
+                    description: Carte Pokémon non trouvée
+        patch:
+            tags:
+                - pokemon-cards
+            summary: Modifie une carte Pokémon
+            security:
+                - bearerAuth: []
+            parameters:
+                - name: pokemonCardId
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+                  description: ID de la carte Pokémon
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/PokemonCard'
+            responses:
+                '200':
+                    description: Carte Pokémon mise à jour
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/PokemonCard'
+                '400':
+                    description: Données invalides
+                '404':
+                    description: Carte Pokémon non trouvée
+        delete:
+            tags:
+                - pokemon-cards
+            summary: Supprime une carte Pokémon
+            security:
+                - bearerAuth: []
+            parameters:
+                - name: pokemonCardId
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+                  description: ID de la carte Pokémon
+            responses:
+                '204':
+                    description: Carte Pokémon supprimée
+                '404':
+                    description: Carte Pokémon non trouvée
+    /users:
+        get:
+            tags:
+                - user
+            summary: Récupère tous les utilisateurs
+            responses:
+                '200':
+                    description: Liste des utilisateurs
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/User'
+                '204':
+                    description: Aucun utilisateur trouvé
+    /user:
+        post:
+            tags:
+                - user
+            summary: Crée un nouvel utilisateur
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/User'
+            responses:
+                '201':
+                    description: Utilisateur créé
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/User'
+                '400':
+                    description: Données invalides
+                '409':
+                    description: Utilisateur déjà existant
+    /user/login:
+        post:
+            tags:
+                - user
+            summary: Connexion d'un utilisateur
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                email:
+                                    type: string
+                                password:
+                                    type: string
+            responses:
+                '200':
+                    description: Connexion réussie
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    token:
+                                        type: string
+                '400':
+                    description: Mot de passe incorrect
+                '204':
+                    description: Utilisateur non trouvé
+    /user/{userId}:
+        patch:
+            tags:
+                - user
+            summary: Met à jour un utilisateur
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/User'
+            responses:
+                '200':
+                    description: Utilisateur mis à jour
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/User'
+                '400':
+                    description: Données invalides
+                '404':
+                    description: Utilisateur non trouvé
+        delete:
+            tags:
+                - user
+            summary: Supprime un utilisateur
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                '204':
+                    description: Utilisateur supprimé
+                '404':
+                    description: Utilisateur non trouvé
+    /pokemon-attacks:
+        get:
+            tags:
+                - pokemon-attacks
+            summary: Récupère toutes les attaques Pokémon
+            responses:
+                '200':
+                    description: Liste des attaques Pokémon
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/Pokemon-attack'
+                '204':
+                    description: Aucune attaque trouvée
+        post:
+            tags:
+                - pokemon-attacks
+            summary: Crée une nouvelle attaque Pokémon
+            security:
+                - bearerAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Pokemon-attack'
+            responses:
+                '201':
+                    description: Attaque Pokémon créée
+                '400':
+                    description: Données invalides
+                '409':
+                    description: Attaque déjà existante
+    /pokemon-attacks/{pokemonAttackId}:
+        get:
+            tags:
+                - pokemon-attacks
+            summary: Récupère une attaque Pokémon par son ID
+            parameters:
+                - name: pokemonAttackId
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                '200':
+                    description: Attaque trouvée
+                '404':
+                    description: Attaque non trouvée
+        patch:
+            tags:
+                - pokemon-attacks
+            summary: Met à jour une attaque Pokémon
+            security:
+                - bearerAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Pokemon-attack'
+            responses:
+                '200':
+                    description: Attaque mise à jour
+                '404':
+                    description: Attaque non trouvée
+        delete:
+            tags:
+                - pokemon-attacks
+            summary: Supprime une attaque Pokémon
+            security:
+                - bearerAuth: []
+            responses:
+                '204':
+                    description: Attaque supprimée
+                '404':
+                    description: Attaque non trouvée
+components:
+    schemas:
+        PokemonCard:
+            type: object
+            properties:
+                id:
+                    type: integer
+                name:
+                    type: string
+                pokedexId:
+                    type: integer
+                type1:
+                    type: string
+                type2:
+                    type: string
+                    nullable: true
+                typeWeakness:
+                    type: string
+                    nullable: true
+                pokemon-attack:
+                    $ref: '#/components/schemas/Pokemon-attack'
+                lifePoints:
+                    type: integer
+                size:
+                    type: number
+                    nullable: true
+                weight:
+                    type: number
+                    nullable: true
+                imageUrl:
+                    type: string
+                    nullable: true
+        User:
+            type: object
+            properties:
+                id:
+                    type: integer
+                email:
+                    type: string
+                password:
+                    type: string
+        Pokemon-attack:
+            type: object
+            properties:
+                id:
+                    type: integer
+                name:
+                    type: string
+                damages:
+                    type: integer
+                type:
+                    type: string
